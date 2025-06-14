@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Glassmorphism Chat UI</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Reset and base */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #191c29 0%,
+          #361a4b 70%,
+          #661b4c 100%
+        );
+        color: #e0e0e0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 50%;
+      }
+      .transfer {
+        border-radius: 10%;
+      }
+
+      /* Utility */
+      .visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+      }
+
+      /* Container limits for large desktop */
+      .container {
+        max-width: 1440px;
+        margin: 0 auto;
+        height: 100dvh;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      /* Header */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 110;
+        background: rgba(19, 20, 27, 0.72);
+        backdrop-filter: saturate(180%) blur(12px);
+        border-bottom: 1px solid rgba(255 255 255 / 0.1);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header h1 {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #e0e0e0;
+        user-select: none;
+      }
+
+      /* Mobile hamburger toggle */
+      .mobile-menu-toggle {
+        background: transparent;
+        border: none;
+        color: #e0e0e0;
+        font-size: 28px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+      }
+
+      .mobile-menu-toggle:focus-visible {
+        outline-offset: 4px;
+        outline: 2px solid #7f56f9;
+      }
+
+      .mobile-menu-toggle:hover {
+        background-color: rgba(255 255 255 / 0.1);
+      }
+
+      /* Main layout grid */
+      main {
+        flex-grow: 1;
+        display: grid;
+        height: calc(100dvh - 64px);
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        background: none;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      /* Left sidebar - Chats List */
+      .sidebar-left {
+        background: rgba(19, 20, 27, 0.45);
+        backdrop-filter: saturate(180%) blur(30px);
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255 255 255 / 0.07);
+        padding: 24px 24px 0 24px;
+        overflow-y: auto;
+        max-height: 100%;
+        min-width: 280px;
+        user-select: none;
+      }
+
+      .sidebar-left header {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidebar-left .header-title {
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.04em;
+        color: #e0e0e0;
+        flex-grow: 1;
+      }
+
+      .sidebar-left .header-actions {
+        display: flex;
+        gap: 12px;
+        color: #aaa;
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .sidebar-left .header-actions:hover {
+        color: #7f56f9;
+      }
+
+      .search-input {
+        width: 100%;
+        margin-bottom: 24px;
+        background: rgba(255 255 255 / 0.05);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: #ccc;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+        appearance: none;
+      }
+
+      .search-input::placeholder {
+        color: #777;
+      }
+
+      .search-input:focus {
+        background: rgba(127, 86, 249, 0.35);
+        outline: none;
+        color: #e0e0e0;
+      }
+
+      .chat-list {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow-y: auto;
+        padding-bottom: 16px;
+      }
+
+      .chat-list::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .chat-list::-webkit-scrollbar-thumb {
+        background: rgba(127, 86, 249, 0.7);
+        border-radius: 12px;
+      }
+
+      .chat-item {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: background-color 0.25s ease;
+        user-select: none;
+      }
+
+      .chat-item:hover,
+      .chat-item.active {
+        background: rgba(127, 86, 249, 0.4);
+      }
+
+      .chat-item .avatar-wrapper {
+        position: relative;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+      }
+
+      .chat-item .avatar-wrapper img {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid transparent;
+        transition: border-color 0.3s ease;
+      }
+
+      .chat-item.active .avatar-wrapper img {
+        border-color: #7f56f9;
+      }
+
+      /* Online status dot on avatar */
+      .chat-item .status-dot {
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+        width: 12px;
+        height: 12px;
+        background-color: #3bd14f;
+        border: 2px solid rgba(19, 20, 27, 0.7);
+        border-radius: 50%;
+        box-shadow: 0 0 6px #3bd14faa;
+      }
+
+      .chat-item .content {
+        flex-grow: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        overflow-wrap: break-word;
+      }
+
+      .chat-item .chat-name {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #ddd;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        user-select: text;
+      }
+
+      .chat-item .chat-preview {
+        font-size: 0.8rem;
+        color: #999;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        user-select: text;
+      }
+
+      /* Middle chat content */
+      .chat-main {
+        background: rgba(19, 20, 27, 0.25);
+        backdrop-filter: saturate(180%) blur(20px);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border-left: 1px solid rgba(255 255 255 / 0.07);
+        border-right: 1px solid rgba(255 255 255 / 0.07);
+      }
+
+      .chat-header {
+        padding: 24px 24px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-bottom: 1px solid rgba(255 255 255 / 0.07);
+        user-select: none;
+        background: rgba(19, 20, 27, 0.3);
+        backdrop-filter: saturate(180%) blur(12px);
+      }
+
+      .chat-header .avatar-wrapper {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        border: 2px solid transparent;
+      }
+
+      .chat-header .avatar-wrapper img {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 50%;
+        user-select: none;
+      }
+
+      .chat-header .status-dot {
+        position: absolute;
+        bottom: 5px;
+        right: 4px;
+        width: 14px;
+        height: 14px;
+        background-color: #3bd14f;
+        border: 2px solid rgba(19, 20, 27, 0.7);
+        border-radius: 50%;
+        box-shadow: 0 0 8px #3bd14fcc;
+      }
+
+      .chat-header .user-info {
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        user-select: text;
+      }
+
+      .chat-header .user-info .name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #e0e0e0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .chat-header .user-info .name .heart {
+        color: #fb3b5c;
+        font-size: 14px;
+        user-select: none;
+      }
+
+      .chat-header .user-info .status {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: #9da3b4;
+        margin-top: 2px;
+      }
+
+      .chat-header .chat-actions {
+        display: flex;
+        gap: 18px;
+        font-size: 24px;
+        color: #8b8e99;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .chat-header .chat-actions:hover {
+        color: #7f56f9;
+      }
+
+      /* Chat messages area */
+      .chat-messages {
+        flex-grow: 1;
+        padding: 24px 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(127, 86, 249, 0.5) transparent;
+      }
+
+      .chat-messages::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .chat-messages::-webkit-scrollbar-thumb {
+        background-color: rgba(127, 86, 249, 0.5);
+        border-radius: 12px;
+      }
+
+      .message {
+        display: inline-flex;
+        max-width: 68%;
+        border-radius: 18px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        word-break: break-word;
+        user-select: text;
+        position: relative;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+      }
+
+      /* Sender messages (left) */
+      .message.sender {
+        background: rgba(53, 66, 93, 0.62);
+        color: #e0e0e0;
+        border-bottom-left-radius: 4px;
+        align-self: flex-start;
+      }
+
+      /* Receiver messages (right) */
+      .message.receiver {
+        background: #7f56f9;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        font-weight: 600;
+      }
+
+      .message.receiver.purple {
+        background: #7f56f9;
+      }
+
+      .message.receiver.pink {
+        background: #ea2d82;
+      }
+
+      .message.receiver.red {
+        background: #ff1e3c;
+      }
+
+      /* Chat input */
+      .chat-input-wrapper {
+        background: rgba(19, 20, 27, 0.3);
+        backdrop-filter: saturate(180%) blur(20px);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-height: 72px;
+        border-top: 1px solid rgba(255 255 255 / 0.07);
+      }
+
+      .chat-input-wrapper input[type="text"] {
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        background: rgba(255 255 255 / 0.06);
+        border-radius: 18px;
+        padding: 14px 20px;
+        color: white;
+        font-weight: 500;
+        font-size: 1rem;
+        user-select: text;
+        transition: background-color 0.3s ease;
+      }
+
+      .chat-input-wrapper input[type="text"]:focus {
+        background: rgba(127, 86, 249, 0.5);
+      }
+
+      .chat-input-wrapper .input-actions {
+        display: flex;
+        gap: 16px;
+        color: #b3aed6;
+        font-size: 22px;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.25s ease;
+      }
+
+      .chat-input-wrapper .input-actions:hover {
+        color: #7f56f9;
+      }
+
+      /* Right sidebar - User info */
+      .sidebar-right {
+        background: rgba(19, 20, 27, 0.4);
+        backdrop-filter: saturate(180%) blur(30px);
+        display: flex;
+        flex-direction: column;
+        padding: 32px 28px;
+        border-left: 1px solid rgba(255 255 255 / 0.07);
+        min-width: 300px;
+        max-width: 360px;
+        overflow-y: auto;
+        user-select: none;
+      }
+
+      .sidebar-right .profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+        gap: 8px;
+        text-align: center;
+      }
+
+      .sidebar-right .profile .avatar-wrapper {
+        position: relative;
+        width: 84px;
+        height: 84px;
+        margin-bottom: 8px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        overflow: hidden;
+      }
+
+      .sidebar-right .profile .avatar-wrapper img {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        object-fit: cover;
+        user-select: none;
+      }
+
+      .sidebar-right .profile .status-dot {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 18px;
+        height: 18px;
+        background-color: #3bd14f;
+        box-shadow: 0 0 12px #3bd14fcc;
+        border-radius: 50%;
+        border: 3px solid rgba(19, 20, 27, 0.7);
+        user-select: none;
+      }
+
+      .sidebar-right .profile .name {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #e0e0e0;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sidebar-right .profile .heart {
+        font-size: 20px;
+        color: #fb3b5c;
+        user-select: none;
+      }
+
+      .sidebar-right .profile .status {
+        color: #9da3b4;
+        font-weight: 400;
+        font-size: 0.9rem;
+        user-select: text;
+      }
+
+      /* Accordion user options on right sidebar */
+      .sidebar-right details {
+        border-top: 1px solid rgba(255 255 255 / 0.06);
+        padding: 14px 0;
+        color: #ddd;
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+      }
+
+      .sidebar-right details summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #ddd;
+        cursor: pointer;
+        outline: none;
+        padding-right: 16px;
+        user-select: none;
+      }
+
+      .sidebar-right details[open] summary::after {
+        content: "▲";
+        font-size: 0.6rem;
+        color: #7f56f9;
+        transform: rotate(180deg);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar-right details summary::after {
+        content: "▼";
+        font-size: 0.6rem;
+        color: #7f56f9;
+        font-weight: 700;
+        user-select: none;
+        margin-left: 6px;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar-right details div.content {
+        margin-top: 14px;
+        padding-left: 8px;
+        color: #aaa;
+      }
+
+      /* Shared files list in right sidebar */
+      .file-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .file-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
+
+      .file-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.3rem;
+        color: #7f56f9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .file-item .download-btn {
+        margin-left: auto;
+        color: #7f56f9;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .file-item .download-btn:hover {
+        color: #ea2d82;
+      }
+
+      /* Responsive layouts and tweaks */
+
+      @media (min-width: 768px) {
+        .container {
+          grid-template-columns: 280px 1fr 320px;
+          height: 100dvh;
+        }
+
+        main {
+          grid-template-columns: 280px 1fr 320px;
+          height: 100dvh;
+        }
+
+        /* Show grid columns on desktop */
+        .sidebar-left,
+        .chat-main,
+        .sidebar-right {
+          display: flex;
+        }
+      }
+
+      @media (max-width: 767px) {
+        header {
+          padding: 12px 16px;
+        }
+
+        /* Container single column on mobile */
+        .container {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        /* Sidebar left hidden by default on mobile, toggled by hamburger */
+        .sidebar-left {
+          position: fixed;
+          top: 64px;
+          left: 0;
+          background: rgba(19, 20, 27, 0.9);
+          min-width: 260px;
+          height: calc(100dvh - 64px);
+          z-index: 120;
+          transition: transform 0.35s ease;
+          box-shadow: 2px 0 21px 1px rgba(127, 86, 249, 0.5);
+          overflow-y: auto;
+          will-change: transform;
+          transform: translateX(-110%);
+          border-right: 1px solid rgba(255 255 255 / 0.1);
+        }
+
+        .sidebar-left.open {
+          transform: translateX(0);
+        }
+
+        .chat-main {
+          border: none;
+        }
+
+        .sidebar-right {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <button
+        aria-label="Toggle chat list"
+        class="mobile-menu-toggle"
+        id="menuToggle"
+        aria-expanded="false"
+        aria-controls="sidebarLeft"
+      >
+        <span class="material-icons">menu</span>
+      </button>
+      <h1>Chats</h1>
+      <div aria-hidden="true" style="width: 44px"></div>
+    </header>
+
+    <div class="container">
+      <aside
+        class="sidebar-left"
+        id="sidebarLeft"
+        aria-label="Chats list"
+        role="region"
+      >
+        <header>
+          <div class="header-title">Chats</div>
+          <div class="header-actions" aria-label="Actions">
+            <span
+              class="material-icons"
+              title="More options"
+              tabindex="0"
+              role="button"
+              >more_horiz</span
+            >
+            <span
+              class="material-icons"
+              title="Video call"
+              tabindex="0"
+              role="button"
+              >videocam</span
+            >
+            <span class="material-icons" title="Edit" tabindex="0" role="button"
+              >edit</span
+            >
+          </div>
+        </header>
+
+        <input
+          type="search"
+          placeholder="Search"
+          aria-label="Search chats"
+          class="search-input"
+        />
+
+        <section class="chat-list" tabindex="0">
+          <article
+            class="chat-item active"
+            tabindex="0"
+            aria-current="true"
+            aria-label="Chat with Big Sis. Last message: Okay, see ya!"
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://img.freepik.com/free-photo/portrait-smiley-african-woman-floral-coat_23-2148747912.jpg?ga=GA1.1.1016606217.1725759852&semt=ais_hybrid&w=740"
+                alt="User avatar of Big Sis"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name"
+                >Big Sis <span aria-hidden="true" class="heart">❤</span></span
+              >
+              <span class="chat-preview"
+                >Okay, see ya!
+                <span aria-hidden="true" class="heart">❤</span></span
+              >
+            </div>
+          </article>
+
+          <article
+            class="chat-item"
+            tabindex="0"
+            aria-label="Chat with Family Chat. Last message: Designing and developing..."
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f0fe8457-b1c7-4ee9-8f67-d2635256660f.png"
+                alt="User avatar of Family Chat"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name">Family Chat</span>
+              <span class="chat-preview">Designing and developing...</span>
+            </div>
+          </article>
+
+          <article
+            class="chat-item"
+            tabindex="0"
+            aria-label="Chat with John Doe. Last message: What's up bro?"
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/363829da-46cf-485d-83be-6ade864a94ee.png"
+                alt="User avatar of John Doe"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name">John Doe</span>
+              <span class="chat-preview">What's up bro?</span>
+            </div>
+          </article>
+
+          <article
+            class="chat-item"
+            tabindex="0"
+            aria-label="Chat with Momo Brown. Last message: I'm really busy right now..."
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/083049de-651a-466d-be35-accc185c9fe2.png"
+                alt="User avatar of Momo Brown"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name">Momo Brown</span>
+              <span class="chat-preview">I'm really busy right now...</span>
+            </div>
+          </article>
+
+          <article
+            class="chat-item"
+            tabindex="0"
+            aria-label="Chat with Matilda White. Last message: 🥖🥖🥖🥖🥖"
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0cc4cffb-8204-47ff-9897-cacbe7d6e69b.png"
+                alt="User avatar of Matilda White"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name">Matilda White</span>
+              <span class="chat-preview">🥖🥖🥖🥖🥖</span>
+            </div>
+          </article>
+
+          <article
+            class="chat-item"
+            tabindex="0"
+            aria-label="Chat with Kevin Klein. Last message: See ya!"
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e5af3a22-2ad0-4b4d-887b-c32db7bc2980.png"
+                alt="User avatar of Kevin Klein"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name">Kevin Klein</span>
+              <span class="chat-preview">See ya!</span>
+            </div>
+          </article>
+
+          <article
+            class="chat-item"
+            tabindex="0"
+            aria-label="Chat with Rebbeca Doe. Last message: Hello I'm contacting you..."
+          >
+            <div class="avatar-wrapper">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/75e84b5e-6631-4e5e-802a-79c68fff54c5.png"
+                alt="User avatar of Rebbeca Doe"
+              />
+              <span class="status-dot"></span>
+            </div>
+            <div class="content">
+              <span class="chat-name">Rebbeca Doe</span>
+              <span class="chat-preview">Hello I'm contacting you...</span>
+            </div>
+          </article>
+        </section>
+      </aside>
+
+      <section
+        class="chat-main"
+        aria-label="Chat conversation with Big Sis"
+        role="main"
+      >
+        <header class="chat-header">
+          <div class="avatar-wrapper">
+            <img
+              src="https://img.freepik.com/free-photo/portrait-smiley-african-woman-floral-coat_23-2148747912.jpg?ga=GA1.1.1016606217.1725759852&semt=ais_hybrid&w=740"
+              alt="User avatar of Big Sis"
+            />
+            <span class="status-dot" aria-hidden="true"></span>
+          </div>
+          <div class="user-info" aria-live="polite">
+            <div class="name" title="Big Sis ❤️">
+              Big Sis <span class="heart" aria-hidden="true">❤</span>
+            </div>
+            <div class="status">Active now</div>
+          </div>
+          <nav class="chat-actions" aria-label="Chat actions">
+            <span class="material-icons" title="Call" tabindex="0" role="button"
+              >call</span
+            >
+            <span
+              class="material-icons"
+              title="Video call"
+              tabindex="0"
+              role="button"
+              >videocam</span
+            >
+            <span class="material-icons" title="Info" tabindex="0" role="button"
+              >info</span
+            >
+          </nav>
+        </header>
+
+        <div
+          class="chat-messages"
+          tabindex="0"
+          aria-live="polite"
+          aria-relevant="additions"
+        >
+          <div
+            class="message sender"
+            role="article"
+            aria-label="Big Sis said: How do you like new messenger design emoji thinking face"
+          >
+            How do you like new Messenger design? 🤔
+          </div>
+
+          <div
+            class="message receiver purple"
+            role="article"
+            aria-label="You said: Meh rolling eyes raised"
+          >
+            Meh 🙄
+          </div>
+
+          <div
+            class="message sender"
+            role="article"
+            aria-label="Big Sis said:  Meh? laughing emoji Does the design not give?? Pinched fingers"
+          >
+            Meh? 😂 Does the design not give??🤌
+          </div>
+
+          <div
+            class="message receiver purple"
+            role="article"
+            aria-label="You said: Wo wo wo.. Ebi n pa emi o dotted face line"
+          >
+            Wo wo wo.. Ebi n pa emi o 🫥
+          </div>
+
+          <div
+            class="message sender"
+            role="article"
+            aria-label="Big Sis said: Tch unamused face"
+          >
+            Tch 😒 <span class="status-dot"></span>
+          </div>
+
+          <div
+            class="message receiver purple"
+            role="article"
+            aria-label="You said: face without mouth"
+          >
+            😶
+          </div>
+
+          <div
+            class="message sender"
+            role="article"
+            aria-label="Big Sis said: FFO unamused face Sha paste aza"
+          >
+            FFO 😒 Sha paste aza
+          </div>
+
+          <div
+            class="message receiver pink"
+            role="article"
+            aria-label="You said:  Hehe face with hand over mouth 02345678910 beaming  face with smiling eye"
+          >
+            Hehe 🤭 02345678910 😁
+          </div>
+
+          <div
+            class="message sender"
+            role="article"
+            aria-label="Big Sis said: image"
+          >
+            <img
+              class="transfer"
+              src="https://i.pinimg.com/736x/c1/bf/51/c1bf516adbe9af8a9e52bc0b5b9e3140.jpg"
+              alt="Bank transfer receipt"
+            />
+          </div>
+
+          <div
+            class="message receiver red"
+            role="article"
+            aria-label="You said: Eshey o! heart"
+          >
+            Eshey o! ❤
+          </div>
+        </div>
+
+        <form
+          class="chat-input-wrapper"
+          aria-label="Send a new message"
+          autocomplete="off"
+          onsubmit="return false;"
+        >
+          <div class="input-actions" aria-hidden="true" tabindex="-1">
+            <span class="material-icons" title="More apps">apps</span>
+            <span class="material-icons" title="Camera">photo_camera</span>
+            <span class="material-icons" title="Gallery">image</span>
+            <span class="material-icons" title="Microphone">mic</span>
+          </div>
+          <input type="text" placeholder="Aa" aria-label="Type your message" />
+          <div class="input-actions" aria-hidden="true" tabindex="-1">
+            <span class="material-icons" title="Emoji"
+              >sentiment_satisfied</span
+            >
+            <span class="material-icons" title="Like">thumb_up</span>
+          </div>
+        </form>
+      </section>
+
+      <aside
+        class="sidebar-right"
+        aria-label="User profile and shared content"
+        role="region"
+      >
+        <section class="profile" tabindex="0" aria-label="User profile info">
+          <div class="avatar-wrapper">
+            <img
+              src="https://img.freepik.com/free-photo/portrait-smiley-african-woman-floral-coat_23-2148747912.jpg?ga=GA1.1.1016606217.1725759852&semt=ais_hybrid&w=740"
+              alt="User avatar of Big Sis"
+            />
+            <span class="status-dot" aria-hidden="true"></span>
+          </div>
+          <div class="name" title="Big Sis ❤️">
+            Big Sis <span class="heart" aria-hidden="true">❤</span>
+          </div>
+          <div class="status">Active now</div>
+        </section>
+
+        <details open>
+          <summary>Set up a chat</summary>
+          <div class="content">
+            <p style="color: #aaa; font-size: 0.9rem">
+              No additional setup required.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Privacy & Help</summary>
+          <div class="content">
+            <p style="color: #aaa; font-size: 0.9rem">
+              Learn more about privacy and help topics.
+            </p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Shared files</summary>
+          <div class="content">
+            <div class="file-list">
+              <div class="file-item" role="listitem" tabindex="0">
+                <span
+                  class="file-icon material-icons"
+                  aria-hidden="true"
+                  title="PDF file"
+                  >picture_as_pdf</span
+                >
+                <span>File 2142.pdf</span>
+                <span
+                  class="material-icons download-btn"
+                  aria-label="Download File 2142.pdf"
+                  role="button"
+                  tabindex="0"
+                  >file_download</span
+                >
+              </div>
+              <div class="file-item" role="listitem" tabindex="0">
+                <span
+                  class="file-icon material-icons"
+                  aria-hidden="true"
+                  title="DOC file"
+                  >article</span
+                >
+                <span>File 2142.doc</span>
+                <span
+                  class="material-icons download-btn"
+                  aria-label="Download File 2142.doc"
+                  role="button"
+                  tabindex="0"
+                  >file_download</span
+                >
+              </div>
+              <div class="file-item" role="listitem" tabindex="0">
+                <span
+                  class="file-icon material-icons"
+                  aria-hidden="true"
+                  title="CSV file"
+                  >table_chart</span
+                >
+                <span>File 2142.csv</span>
+                <span
+                  class="material-icons download-btn"
+                  aria-label="Download File 2142.csv"
+                  role="button"
+                  tabindex="0"
+                  >file_download</span
+                >
+              </div>
+              <div class="file-item" role="listitem" tabindex="0">
+                <span
+                  class="file-icon material-icons"
+                  aria-hidden="true"
+                  title="PDF file"
+                  >picture_as_pdf</span
+                >
+                <span>File 2142.pdf</span>
+                <span
+                  class="material-icons download-btn"
+                  aria-label="Download File 2142.pdf"
+                  role="button"
+                  tabindex="0"
+                  >file_download</span
+                >
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Shared photos</summary>
+          <div class="content">
+            <p style="color: #aaa; font-size: 0.9rem">No photos shared yet.</p>
+          </div>
+        </details>
+      </aside>
+    </div>
+
+    <script>
+      // Toggle left sidebar on mobile
+      const menuToggleBtn = document.getElementById("menuToggle");
+      const sidebarLeft = document.getElementById("sidebarLeft");
+
+      menuToggleBtn.addEventListener("click", () => {
+        const isOpen = sidebarLeft.classList.toggle("open");
+        menuToggleBtn.setAttribute("aria-expanded", isOpen.toString());
+      });
+
+      // Close sidebar on outside click (mobile)
+      document.body.addEventListener("click", (e) => {
+        if (
+          !sidebarLeft.contains(e.target) &&
+          !menuToggleBtn.contains(e.target)
+        ) {
+          sidebarLeft.classList.remove("open");
+          menuToggleBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+    </script>
+  </body>
+</html>
