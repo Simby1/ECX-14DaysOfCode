@@ -181,22 +181,22 @@ h1 {
   }
 
   h1 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .intro {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.35;
   }
 
   .search-box input {
     padding: 7px;
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .search-box button {
     padding: 7px;
-    font-size: 9px;
+    font-size: 11px;
   }
 }
 </style>
