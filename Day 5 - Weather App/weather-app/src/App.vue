@@ -167,7 +167,6 @@ h1 {
   margin-top: 10px;
 }
 
-/* We'll use Vue's v-if/v-show instead of a 'hidden' class for dynamic display */
 .error-message {
   color: red;
   font-weight: bold;
