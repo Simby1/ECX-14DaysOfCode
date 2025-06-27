@@ -2,7 +2,7 @@
 
 A collection of Projects from the ECX 14 days of code challenge
 
-## Link to Live Projects 
+## Link to Live Projects
 
 Day 1 - Basic HTML Cat Photo App - https://ecx-14-days-of-code.vercel.app/
 
