@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roman Numeral Converter</title>
+    <!-- Google Fonts - Inter for a modern look -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="converter-container">
+      <h1>Roman Numeral Converter</h1>
+
+      <!-- Arabic Number Input Field (first) -->
+      <div class="input-group">
+        <label for="arabicInput"> Arabic Number (1 - 1000) </label>
+        <input
+          type="number"
+          id="arabicInput"
+          placeholder="e.g., 9, 42, 999"
+          min="1"
+          max="1000"
+          aria-describedby="arabicError"
+        />
+        <p id="arabicError" class="error-message"></p>
+      </div>
+
+      <!-- Roman Numeral Input Field (second) -->
+      <div class="input-group">
+        <label for="romanInput"> Roman Numeral (I - M) </label>
+        <input
+          type="text"
+          id="romanInput"
+          placeholder="e.g., IX, XLII, CMXCIX"
+          aria-describedby="romanError"
+        />
+        <p id="romanError" class="error-message"></p>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
