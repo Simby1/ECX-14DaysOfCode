@@ -3,7 +3,7 @@
 const UNSPLASH_ACCESS_KEY = "irQVnnp1LzOnbNXR92Fi8TKoy4zCBHw71iZ5NF-AHo8";
 const IMAGE_COUNT_PER_PAGE = 4; // number of images to fetch per request
 
-let currentPage = 1;
+let currentPage = Math.floor(Math.random() * 100) + 1; // to select images from random pages on unsplash.. Unsplash random image generator's API has restricted number of requests 
 let isLoading = false;
 let hasMore = true;
 
